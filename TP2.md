@@ -1,6 +1,6 @@
 # 1. Affichage d’informations sur la pile TCP/IP locale
 
-![Informations interface Wi-Fi](images/wifi_ipconfig.png)
+![img1](image/img1.png)
 
 Masque /20 → 4096 adresses par réseau.
 
@@ -31,7 +31,7 @@ Sans gateway, la communication serait limitée au réseau local.
 
 ## Interface Ethernet
 
-![Interface Ethernet DOWN](images/ethernet_down.png)
+![img1](image/img2.png)
 
 Interface Ethernet :  
 DOWN (Déconnecté donc aucune adresse attribuée)
@@ -54,7 +54,7 @@ Les adresses IP non listées peuvent être considérées comme potentiellement l
 
 J’ai également testé la commande **nmap -sL**, qui liste les hôtes connus du réseau, même s’ils sont déconnectés.
 
-![Résultat nmap](images/nmap_result.png)
+![img1](image/img3.png)
 
 ---
 
@@ -64,15 +64,19 @@ Paramètres → Réseau et Internet → Wi-Fi → Propriétés matérielles → 
 
 Ici on applique une IP disponible sur le réseau.
 
-![Configuration IPv4 manuelle](images/ip_manuel.png)
+![img1](image/img4.png)
 
 Si on change la passerelle par défaut, nous n’avons plus accès à Internet.
+
+![img1](image/img5.png)
 
 ---
 
 # III. DHCP
 
-![Informations DHCP](images/dhcp_infos.png)
+![img1](image/img6.png)
+
+![img1](image/img7.png)
 
 Serveur DHCP :  
 10.33.79.254  
@@ -98,6 +102,8 @@ ipconfig /renew
 
 # 2. DNS
 
+![img1](image/img8.png)
+
 Adresse IPv4 :
 192.168.0.22
 
@@ -108,25 +114,25 @@ Serveur DNS IPv6 :
 fd0f:ee:b0::1
 
 nslookup google.com
-nslookup google.com
 
+![img1](image/img9.png)
 
 Le nom de domaine google.com est associé à plusieurs adresses IP.
 
 nslookup ynov.com
-nslookup ynov.com
 
+![img1](image/img10.png)
 
 Le nom de domaine ynov.com est associé à plusieurs adresses IP.
 
 nslookup 78.78.21.21
-nslookup 78.78.21.21
 
+![img1](image/img11.png)
 
 Le nom de domaine 78.78.21.21 est associé à plusieurs adresses IP.
 
 nslookup 92.16.54.88
-nslookup 92.16.54.88
 
+![img1](image/img12.png)
 
 Cette adresse IP possède également une entrée DNS.
