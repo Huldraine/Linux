@@ -43,7 +43,6 @@ DOWN (Déconnecté donc aucune adresse attribuée)
 J’ai utilisé l’outil **nmap** pour scanner le réseau Wi-Fi Ingésup.  
 Le réseau étant `10.33.64.0/20`, la commande utilisée est :
 
-```bash
 nmap -sn -PE 10.33.64.0/20
 
 Cette commande permet d’identifier les hôtes actuellement actifs sur le réseau.  
@@ -96,7 +95,6 @@ Ce mécanisme permet :
 - d’éviter les conflits d’adresses IP
 - de simplifier la configuration réseau
 
-```bash
 ipconfig /release
 ipconfig /renew
 
