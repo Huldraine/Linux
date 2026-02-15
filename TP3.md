@@ -126,7 +126,7 @@ il faut exactement les mêmes paramètres qu’au chiffrement.
 
 #### Pourquoi PBKDF2 ?
 
-Pour durcir la dérivation de clé à partir du mot de passe  
+Pour rendre la clé plus difficile à deviner à partir du mot de passe et ralentir les attaques par brute force sur le mot de passe.
 
 ---
 
