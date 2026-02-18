@@ -5,30 +5,30 @@
 
 ## 📑 Sommaire
 
-- [1. Création d’un réseau local](#1-création-dun-réseau-local)
-- [2. Tests de connectivité](#2-tests-de-connectivité)
-- [3. Utilisation d’un PC comme Gateway](#3-utilisation-dun-pc-comme-gateway)
-- [4. Petit chat privé avec Netcat](#4-petit-chat-privé-avec-netcat)
-- [5. Analyse avec Wireshark](#5-analyse-avec-wireshark)
-- [6. Configuration du Firewall](#6-configuration-du-firewall)
-- [7. Conclusion](#7-conclusion)
+1. [Création d’un réseau local](#1-création-dun-réseau-local)  
+2. [Tests de connectivité](#2-tests-de-connectivité)  
+3. [Utilisation d’un PC comme Gateway](#3-utilisation-dun-pc-comme-gateway)  
+4. [Chat privé avec Netcat](#4-chat-privé-avec-netcat)  
+5. [Analyse du trafic avec Wireshark](#5-analyse-du-trafic-avec-wireshark)  
+6. [Configuration du Firewall](#6-configuration-du-firewall)  
+7. [Conclusion](#7-conclusion)
 
 ---
 
 # 1. Création d’un réseau local
 
-## 1) Prérequis
+## 🔧 1.1 Prérequis
 
-- 2 PCs avec port RJ45  
-- 1 câble Ethernet  
-- Firewalls désactivés au départ  
+- Deux PCs équipés d’un port RJ45  
+- Un câble Ethernet  
+- Firewalls désactivés initialement  
 - Configuration IP manuelle  
 
 ---
 
-## 2) Configuration des adresses IP
+## 🌐 1.2 Configuration des adresses IP
 
-Chaque machine possède une carte Ethernet configurée manuellement.
+Chaque machine est configurée manuellement afin d’appartenir au même réseau.
 
 ![Configuration IP](imageTP2-P2/img4.png)
 
@@ -37,11 +37,13 @@ Chaque machine possède une carte Ethernet configurée manuellement.
 | PC1      | 192.168.0.50  | 255.255.252.0 (/22) | 192.168.0.51 |
 | PC2      | 192.168.0.51  | 255.255.252.0 (/22) | — |
 
+Les deux machines appartiennent donc au même réseau logique.
+
 ---
 
 # 2. Tests de connectivité
 
-## 1) Ping local
+## 🖧 2.1 Ping local
 
 ```bash
 ping 192.168.0.50 -c 4
@@ -49,17 +51,17 @@ ping 192.168.0.50 -c 4
 
 ![Ping local](imageTP2-P2/img15.png)
 
-Résultat :
+**Résultat :**
 
 ```
 0% packet loss
 ```
 
-Temps inférieur à 1 ms → communication Ethernet directe.
+Temps de réponse inférieur à 1 ms → communication Ethernet directe validée.
 
 ---
 
-## 2) Ping Internet
+## 🌍 2.2 Ping Internet
 
 ```bash
 ping google.fr -c 4
@@ -67,7 +69,7 @@ ping google.fr -c 4
 
 ![Ping Internet](imageTP2-P2/img2.png)
 
-Réponses reçues → accès Internet fonctionnel.
+Des réponses sont reçues → l’accès Internet fonctionne correctement.
 
 ---
 
@@ -75,19 +77,19 @@ Réponses reçues → accès Internet fonctionnel.
 
 ## 🎯 Objectif
 
-Permettre à un PC sans WiFi d’accéder à Internet via l’autre PC.
+Permettre à un PC sans WiFi d’accéder à Internet via l’autre machine.
 
 ---
 
-## 1) Désactivation du WiFi
+## 📡 3.1 Désactivation du WiFi
 
 ![WiFi désactivé](imageTP2-P2/img3.png)
 
-Le PC1 n’a plus d’accès Internet direct.
+Le PC1 ne possède plus d’accès Internet direct.
 
 ---
 
-## 2) Activation du routage
+## 🔁 3.2 Activation du routage IP
 
 ```bash
 sudo sysctl -w net.ipv4.ip_forward=1
@@ -95,9 +97,11 @@ sudo sysctl -w net.ipv4.ip_forward=1
 
 ![Activation IP Forward](imageTP2-P2/img13.png)
 
+L’activation de `ip_forward` permet au PC2 de router les paquets entre ses interfaces.
+
 ---
 
-## 3) Configuration NAT (MASQUERADE)
+## 🔄 3.3 Mise en place du NAT (MASQUERADE)
 
 ```bash
 sudo iptables -t nat -A POSTROUTING -o wlp4s0 -j MASQUERADE
@@ -107,21 +111,23 @@ sudo iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 ![Commandes iptables](imageTP2-P2/img6.png)
 
+Le NAT permet au trafic du PC1 d’être “masqué” derrière l’adresse IP du PC2.
+
 ---
 
-## 4) Test via gateway
+## 🌐 3.4 Test via la Gateway
 
 ```bash
 ping 8.8.8.8
 ```
 
-✔ Internet fonctionne via l’autre PC.
+✔ Les réponses sont reçues → Internet fonctionne désormais via la gateway.
 
 ---
 
-# 4. Petit chat privé avec Netcat
+# 4. Chat privé avec Netcat
 
-## 1) Serveur
+## 🖥 4.1 Serveur
 
 ```bash
 nc -l -p 8888
@@ -129,9 +135,11 @@ nc -l -p 8888
 
 ![Netcat serveur](imageTP2-P2/img9.png)
 
+Le serveur écoute sur le port TCP 8888.
+
 ---
 
-## 2) Client
+## 💻 4.2 Client
 
 ```bash
 nc 192.168.0.51 8888
@@ -149,13 +157,13 @@ message
 
 ![Échanges Netcat](imageTP2-P2/img8.png)
 
-Communication bidirectionnelle validée.
+Communication bidirectionnelle établie avec succès.
 
 ---
 
-# 5. Analyse avec Wireshark
+# 5. Analyse du trafic avec Wireshark
 
-## 1) Installation
+## 📥 5.1 Installation
 
 ```bash
 sudo apt install wireshark
@@ -166,9 +174,9 @@ sudo usermod -aG wireshark administrateur
 
 ---
 
-## 2) Capture ICMP
+## 📡 5.2 Capture ICMP (Ping)
 
-Filtre :
+Filtre utilisé :
 
 ```
 icmp
@@ -176,14 +184,16 @@ icmp
 
 ![Capture ICMP](imageTP2-P2/img12.png)
 
-Observation :
+**Observation :**
 
-- ICMP Echo Request (Type 8)
-- ICMP Echo Reply (Type 0)
+- ICMP Type 8 → Echo Request  
+- ICMP Type 0 → Echo Reply  
+
+Cela confirme le fonctionnement du protocole ICMP.
 
 ---
 
-## 3) Capture TCP (Netcat)
+## 🔐 5.3 Capture TCP (Netcat)
 
 Filtre :
 
@@ -193,16 +203,19 @@ tcp.port == 8888
 
 ![Capture TCP](imageTP2-P2/img11.png)
 
-Observation :
+**Observation :**
 
-- Handshake TCP (SYN / SYN-ACK / ACK)
-- Segments PSH, ACK
+- Handshake TCP (SYN / SYN-ACK / ACK)  
+- Segments PSH, ACK  
+- Transmission des données  
+
+Cela démontre le fonctionnement de la communication TCP.
 
 ---
 
 # 6. Configuration du Firewall
 
-## 1) Politique DROP
+## 🔒 6.1 Mise en place d’une politique restrictive
 
 ```bash
 sudo iptables -P INPUT DROP
@@ -212,9 +225,11 @@ sudo iptables -P FORWARD DROP
 
 ![Activation firewall](imageTP2-P2/img14.png)
 
+La politique par défaut bloque désormais tout le trafic.
+
 ---
 
-## 2) Autorisation ICMP
+## 🟢 6.2 Autorisation ICMP
 
 ```bash
 sudo iptables -A INPUT -p icmp -j ACCEPT
@@ -223,9 +238,11 @@ sudo iptables -A OUTPUT -p icmp -j ACCEPT
 
 ![Règles ICMP](imageTP2-P2/img16.png)
 
+Le ping fonctionne malgré la politique restrictive.
+
 ---
 
-## 3) Autorisation port 8888
+## 🟢 6.3 Autorisation du port 8888
 
 ```bash
 sudo iptables -A INPUT -p tcp --dport 8888 -j ACCEPT
@@ -234,9 +251,11 @@ sudo iptables -A OUTPUT -p tcp --sport 8888 -j ACCEPT
 
 ![Ouverture port 8888](imageTP2-P2/img7.png)
 
+Netcat fonctionne désormais avec firewall actif.
+
 ---
 
-## 4) Vérification des règles
+## 📋 6.4 Vérification des règles
 
 ```bash
 sudo iptables -L -n -v
@@ -244,24 +263,32 @@ sudo iptables -L -n -v
 
 ![Liste règles iptables](imageTP2-P2/img17.png)
 
+Les chaînes INPUT, OUTPUT et FORWARD affichent les règles appliquées.
+
 ---
 
 # 7. Conclusion
 
-Ce TP nous a permis de comprendre :
+Ce TP a permis de mettre en pratique plusieurs notions fondamentales en réseau :
 
-- La création d’un réseau local via configuration IP  
-- Le rôle des masques réseau  
-- L’utilisation d’un PC comme passerelle (gateway)  
-- Le fonctionnement du NAT (MASQUERADE)  
-- Le protocole ICMP (ping)  
-- Le fonctionnement TCP avec Netcat  
-- L’analyse du trafic avec Wireshark  
-- La configuration d’un firewall Linux avec iptables  
+- Création et configuration d’un réseau local  
+- Compréhension des masques réseau  
+- Mise en place d’une passerelle (gateway)  
+- Fonctionnement du NAT (MASQUERADE)  
+- Analyse du protocole ICMP  
+- Communication TCP via Netcat  
+- Capture et analyse de trames avec Wireshark  
+- Configuration d’un firewall Linux avec iptables  
 
-## ✔ Résultats validés
+---
 
-- Communication locale fonctionnelle  
-- Accès Internet via gateway  
-- Capture ICMP et TCP réussie  
-- Firewall actif avec règles correctes  
+## ✔ Résultats obtenus
+
+- Communication Ethernet fonctionnelle  
+- Accès Internet via gateway validé  
+- Capture ICMP et TCP analysée  
+- Firewall configuré avec succès  
+
+---
+
+**TP validé.**
