@@ -18,7 +18,7 @@
 
 Les deux machines sont configurées manuellement afin d’appartenir au même réseau.
 
-![Configuration IP](imageTP2-P2/img4.png)
+![Configuration IP](imageTP2-P2/img14.png)
 
 | Machine | Adresse IP     | Masque              | Passerelle      |
 |----------|---------------|---------------------|----------------|
@@ -135,7 +135,7 @@ Sans cela, le PC2 ne transfère pas les paquets entre ses interfaces réseau.
 nc -l -p 8888
 ```
 
-![Netcat serveur](imageTP2-P2/img9.png)
+![Netcat serveur](imageTP2-P2/img4.png)
 
 ---
 
@@ -231,7 +231,7 @@ sudo iptables -P OUTPUT DROP
 sudo iptables -P FORWARD DROP
 ```
 
-![Activation firewall](imageTP2-P2/img14.png)
+![Activation firewall](imageTP2-P2/img12.png)
 
 ---
 
