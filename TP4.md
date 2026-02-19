@@ -33,7 +33,7 @@ ip a
 ping <IP_VM>
 ```
 
-!(imageTP4/img1.png)
+![img1](imageTP4/img1.png)
 
 # B. Installation et configuration SSH
 
@@ -50,7 +50,7 @@ Connexion depuis la machine cliente :
 
 ssh benoit@192.168.0.29
 
-!(imageTP4/img2.png)
+![img1](imageTP4/img2.png)
 
 La connexion au serveur SSH est fonctionnelle.
 
@@ -58,16 +58,16 @@ La connexion au serveur SSH est fonctionnelle.
 Génération de la clé sur la machine cliente
 ssh-keygen
 
-!(imageTP4/img3.png)
+![img1](imageTP4/img3.png)
 
 Copie de la clé publique vers le serveur
 ssh-copy-id benoit@192.168.0.29
 
-!(imageTP4/img4.png)
+![img1](imageTP4/img4.png)
 
 Connexion sans mot de passe validée :
 
-!(imageTP4/img5.png)
+![img1](imageTP4/img5.png)
 
 L’authentification par clé est opérationnelle.
 
@@ -89,11 +89,11 @@ sudo systemctl restart ssh
 
 Vérification du port personnalisé :
 
-!(imageTP4/img6.png)
+![img1](imageTP4/img6.png)
 
 Test de connexion avec le nouveau port :
 
-!(imageTP4/img7.png)
+![img1](imageTP4/img7.png)
 
 Le serveur SSH fonctionne maintenant sur le port 2223 avec authentification par clé uniquement.
 
@@ -110,13 +110,13 @@ Host serveur-tp
     User benoit
     Port 2223
 
-!(imageTP4/img8.png)
+![img1](imageTP4/img8.png)
 
 Connexion simplifiée :
 
 ssh serveur-tp
 
-!(imageTP4/img9.png)
+![img1](imageTP4/img9.png)
 
 D. Transfert de fichiers
 1) SCP
@@ -151,7 +151,7 @@ E. Analyse des logs et Fail2Ban
 1) Analyse des logs SSH
 sudo tail -f /var/log/auth.log
 
-!(imageTP4/img11.png)
+![img1](imageTP4/img11.png)
 
 On observe les connexions SSH et l’authentification par clé :
 
@@ -179,7 +179,7 @@ sudo systemctl restart fail2ban
 
 Test de bannissement :
 
-!(imageTP4/img12.png)
+![img1](imageTP4/img12.png)
 
 Fail2Ban bloque automatiquement les tentatives répétées.
 
@@ -191,7 +191,7 @@ Accès au service web distant via :
 
 http://localhost:8080
 
-!(imageTP4/img13.png)
+![img1](imageTP4/img13.png)
 
 2) Tunnel distant
 ssh -R 9090:localhost:22 serveur-tp
@@ -200,7 +200,7 @@ Vérification :
 
 curl http://localhost:9090
 
-!(imageTP4/img14.png)
+![img1](imageTP4/img14.png)
 
 Le tunnel distant permet l’accès SSH via le serveur.
 
@@ -208,7 +208,7 @@ G. Installation et configuration Nginx
 1) Installation
 sudo apt install nginx
 
-!(imageTP4/img15.png)
+![img1](imageTP4/img15.png)
 
 2) Création du site
 sudo mkdir -p /var/www/site-tp
@@ -217,7 +217,7 @@ Création du fichier index.html :
 
 <h1>HTTPS OK - site-tp</h1>
 
-!(imageTP4/img16.png)
+![img1](imageTP4/img16.png)
 
 3) Configuration Nginx
 
@@ -225,7 +225,7 @@ Fichier :
 
 /etc/nginx/sites-available/site-tp
 
-!(imageTP4/img17.png)
+![img1](imageTP4/img17.png)
 
 Activation et vérification :
 
@@ -239,17 +239,17 @@ cd /etc/nginx/ssl
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 -keyout site-tp.key -out site-tp.crt
 
-!(imageTP4/img18.png)
+![img1](imageTP4/img18.png)
 
 2) Test HTTPS
 curl -k https://192.168.0.29
 
-!(imageTP4/img19.png)
+![img1](imageTP4/img19.png)
 
 3) Redirection HTTP → HTTPS
 curl -I http://192.168.0.29
 
-!(imageTP4/img20.png)
+![img1](imageTP4/img20.png)
 
 Le code 301 Moved Permanently confirme la redirection automatique.
 
@@ -258,7 +258,7 @@ I. Firewall et permissions
 sudo ufw allow 'Nginx Full'
 sudo ufw status
 
-!(imageTP4/img21.png)
+![img1](imageTP4/img21.png)
 
 Ports autorisés :
 
