@@ -221,7 +221,7 @@ sudo systemctl restart fail2ban
 
 ![Redémarrage Fail2Ban](imageTP4/img24.png)
 
-Surveillance des logs de bannissement : voir image 25.
+![Ban Fail2Ban](imageTP4/img25.png)
 
 ---
 
