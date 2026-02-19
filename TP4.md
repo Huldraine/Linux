@@ -44,7 +44,7 @@ sudo systemctl status ssh
 sudo ss -tlnp | grep ssh
 ```
 
-![Connexion SSH](imageTP4/img2.png)  <!-- sortie de systemctl/ss -->
+![Service SSH démarré et port à l’écoute](imageTP4/img35.png)  <!-- démarrage et vérification -->
 
 ---
 
@@ -54,10 +54,12 @@ sudo ss -tlnp | grep ssh
 ssh etudiant@<IP_VM>
 ```
 
-Accepter l’empreinte, entrer le mot de passe. La clé du serveur est ajoutée à
+Accepter l’empreinte et saisir le mot de passe. La clé du serveur est ajoutée à
 `~/.ssh/known_hosts`.
 
-![Connexion depuis Windows](imageTP4/img10.png)  <!-- exemple de connexion -->
+![Commande SSH initiale depuis l’hôte](imageTP4/img2.png)
+
+![Message de bienvenue reçu après la connexion](imageTP4/img5.png)
 
 ---
 
@@ -150,7 +152,11 @@ scp fichier.txt serveur-tp:/home/etudiant/
 scp -r dossier/ serveur-tp:/home/etudiant/
 ```
 
-![Transfert SCP](imageTP4/img10.png)
+![Commande scp en action](imageTP4/img13.png)
+
+Après création du fichier de test et transfert on peut vérifier son contenu :
+
+![Vérification du fichier copié](imageTP4/img15.png)
 
 ### 7.2 SFTP
 
@@ -229,11 +235,11 @@ ssh -L 8080:localhost:80 serveur-tp
 
 Permet d’accéder à un service HTTP distant via `http://localhost:8080`.
 
-![Tunnel local établi](imageTP4/img13.png)
+![Commande de tunnel local](imageTP4/img29.png)
 
 Résultat affiché par curl :
 
-![Page locale](imageTP4/img29.png)
+![Contenu accessible via le tunnel](imageTP4/img30.png)
 
 ### 10.2 Tunnel distant
 
@@ -243,7 +249,7 @@ ssh -R 9090:localhost:22 serveur-tp
 
 Sur le serveur, `curl http://localhost:9090` renvoie la page du client :
 
-![Tunnel distant](imageTP4/img30.png)
+![Commande curl depuis le serveur vers le tunnel](imageTP4/img33.png)
 
 ---
 
@@ -414,3 +420,21 @@ sudo chmod -R 755 /var/www/site-tp
 - Certificat auto-signé fonctionnel
 - Firewall configuré
 - Page test accessible depuis le client
+
+---
+
+### Annexe : autres captures
+
+Les images suivantes n'ont pas été insérées dans le rapport principal mais
+peuvent servir de support ou de vérification ultérieure :
+
+```
+img6.png  img7.png  img8.png  img9.png  img10.png img12.png img14.png
+img18.png img19.png img20.png img23.png img25.png img26.png img27.png
+img28.png img31.png img32.png img34.png img36.png img41.png img42.png
+img46.png img49.png img50.png img51.png img52.png img53.png img55.png
+img56.png img57.png img58.png
+```
+
+(la numérotation est celle du répertoire `imageTP4`)
+
