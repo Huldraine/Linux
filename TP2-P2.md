@@ -18,8 +18,6 @@
 
 Les deux machines sont configurées manuellement afin d’appartenir au même réseau.
 
-![Configuration IP](imageTP2-P2/img14.png)
-
 | Machine | Adresse IP     | Masque              | Passerelle      |
 |----------|---------------|---------------------|----------------|
 | PC1      | 192.168.0.50  | 255.255.252.0 (/22) | 192.168.0.51 |
@@ -33,7 +31,7 @@ Les deux machines sont configurées manuellement afin d’appartenir au même r�
 ping 192.168.0.50 -c 4
 ```
 
-![Ping local](imageTP2-P2/img15.png)
+![Configuration IP](imageTP2-P2/img14.png)
 
 Résultat :
 
@@ -135,7 +133,7 @@ Sans cela, le PC2 ne transfère pas les paquets entre ses interfaces réseau.
 nc -l -p 8888
 ```
 
-![Netcat serveur](imageTP2-P2/img4.png)
+![Netcat serveur](imageTP2-P2/img8.png)
 
 ---
 
@@ -144,9 +142,6 @@ nc -l -p 8888
 ```bash
 nc 192.168.0.51 8888
 ```
-
-![Netcat client](imageTP2-P2/img5.png)
-
 ---
 
 ## 3) Échanges
@@ -157,7 +152,7 @@ bonjour
 message
 ```
 
-![Échanges Netcat](imageTP2-P2/img8.png)
+![Échanges Netcat](imageTP2-P2/img4.png)
 
 Communication bidirectionnelle établie avec succès.
 
