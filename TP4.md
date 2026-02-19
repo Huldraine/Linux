@@ -168,8 +168,6 @@ sftp serveur-tp
 > exit
 ```
 
-(Rien de capturé, traces non disponibles)
-
 ### 7.3 RSYNC
 
 ```bash
