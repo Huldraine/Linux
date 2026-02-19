@@ -1,290 +1,416 @@
-# 🔐 TP – Administration SSH et Serveur Web Nginx
+# 🔐 TP4 – Administration SSH & Serveur Web Nginx (adapté au nouveau sujet)
+
+Ce document suit précisément le sujet mis à jour dans `subject.md`. Les
+captures proviennent de `imageTP4` et sont placées là où elles apportent une
+illustration utile.
 
 ---
 
-## 📑 Sommaire
+## 1. Mise en place de l’environnement virtualisé
 
-- [A. Environnement virtualisé](#a-environnement-virtualisé)
-- [B. Installation et configuration SSH](#b-installation-et-configuration-ssh)
-- [C. Sécurisation du serveur SSH](#c-sécurisation-du-serveur-ssh)
-- [D. Transfert de fichiers](#d-transfert-de-fichiers)
-- [E. Analyse des logs et Fail2Ban](#e-analyse-des-logs-et-fail2ban)
-- [F. Tunnels SSH](#f-tunnels-ssh)
-- [G. Installation et configuration Nginx](#g-installation-et-configuration-nginx)
-- [H. HTTPS et certificat auto-signé](#h-https-et-certificat-auto-signé)
-- [I. Firewall et permissions](#i-firewall-et-permissions)
-- [J. Validation finale](#j-validation-finale)
+- Installer VirtualBox sur l’hôte :
 
----
+```bash
+sudo apt update
+sudo apt install virtualbox
+virtualbox --help
+```
 
-# A. Environnement virtualisé
+- Créer une VM Ubuntu « Serveur-SSH » : 2 Go RAM, 20 Go disque, réseau en
+  **Bridged Adapter**.
 
-## Configuration de la VM
-
-- Ubuntu sous VirtualBox  
-- 2 Go RAM minimum  
-- 20 Go disque  
-- Mode réseau : Bridged Adapter  
-
-Vérification IP :
+Vérifier l’adresse IP dans la VM et ping depuis l’hôte :
 
 ```bash
 ip a
 ping <IP_VM>
 ```
 
-![img1](imageTP4/img1.png)
+![VM IP](imageTP4/img1.png)
 
-# B. Installation et configuration SSH
+---
 
-## 1) Installation du serveur SSH
+## 2. Installation et configuration du serveur SSH
 
 ```bash
+sudo apt update
 sudo apt install openssh-server
 ```
-2) Vérification du service SSH
+
+Vérifier que le service tourne :
+
+```bash
 sudo systemctl status ssh
 sudo ss -tlnp | grep ssh
+```
 
-Connexion depuis la machine cliente :
+![Connexion SSH](imageTP4/img2.png)  <!-- sortie de systemctl/ss -->
 
-ssh benoit@192.168.0.29
+---
 
-![img1](imageTP4/img2.png)
+## 3. Première connexion SSH
 
-La connexion au serveur SSH est fonctionnelle.
+```bash
+ssh etudiant@<IP_VM>
+```
 
-3) Mise en place de l’authentification par clé
-Génération de la clé sur la machine cliente
-ssh-keygen
+Accepter l’empreinte, entrer le mot de passe. La clé du serveur est ajoutée à
+`~/.ssh/known_hosts`.
 
-![img1](imageTP4/img3.png)
+![Connexion depuis Windows](imageTP4/img10.png)  <!-- exemple de connexion -->
 
-Copie de la clé publique vers le serveur
-ssh-copy-id benoit@192.168.0.29
+---
 
-![img1](imageTP4/img4.png)
+## 4. Authentification par clé
 
-Connexion sans mot de passe validée :
+### 4.1 Génération de clé
 
-![img1](imageTP4/img5.png)
+```bash
+ssh-keygen -t ed25519
+```
 
-L’authentification par clé est opérationnelle.
+![Génération clé](imageTP4/img3.png)
 
-C. Sécurisation du serveur SSH
+### 4.2 Copier la clé vers le serveur
 
-Modification du fichier de configuration :
+```bash
+ssh-copy-id etudiant@<IP_VM>
+```
 
-sudo nano /etc/ssh/sshd_config
+![Copie de la clé](imageTP4/img4.png)
 
-Paramètres modifiés :
+### 4.3 Test
 
-PermitRootLogin no
+```bash
+ssh etudiant@<IP_VM>
+```
+
+![Connexion sans mot de passe](imageTP4/img5.png)
+
+---
+
+## 5. Sécurisation du serveur
+
+Modifier `/etc/ssh/sshd_config` : désactiver mot de passe et root, changer le
+port.
+
+```
 PasswordAuthentication no
-Port 2223
+PermitRootLogin no
+Port 2222
+```
 
-Redémarrage du service :
+Redémarrer SSH :
 
+```bash
 sudo systemctl restart ssh
+```
 
-Vérification du port personnalisé :
+Vérifier l’écoute sur le port 2222 :
 
-![img1](imageTP4/img6.png)
+```bash
+sudo ss -tlnp | grep 2222
+```
 
-Test de connexion avec le nouveau port :
+![Vérification du port](imageTP4/img35.png)
 
-![img1](imageTP4/img7.png)
+Tester la connexion sur le nouveau port (échec avant modification illustré :)
 
-Le serveur SSH fonctionne maintenant sur le port 2223 avec authentification par clé uniquement.
+![Connexion refusée sur 2222](imageTP4/img37.png)
 
-Création d’un alias SSH
+---
 
-Édition du fichier client :
+## 6. Configuration d’un alias SSH
 
-nano ~/.ssh/config
+Ajouter dans `~/.ssh/config` :
 
-Contenu :
-
+```
 Host serveur-tp
-    HostName 192.168.0.29
-    User benoit
-    Port 2223
+    HostName <IP_VM>
+    User etudiant
+    Port 2222
+```
 
-![img1](imageTP4/img8.png)
+![Alias SSH](imageTP4/img39.png)
 
-Connexion simplifiée :
+Connexion simplifiée :
 
+```bash
 ssh serveur-tp
+```
 
-![img1](imageTP4/img9.png)
+---
 
-D. Transfert de fichiers
-1) SCP
-scp test.txt serveur-tp:/home/benoit/
+## 7. Transfert de fichiers
 
-!(imageTP4/img10.png)
+### 7.1 SCP
 
-Le fichier est correctement transféré vers le serveur.
+```bash
+scp fichier.txt serveur-tp:/home/etudiant/
+scp -r dossier/ serveur-tp:/home/etudiant/
+```
 
-2) SFTP
+![Transfert SCP](imageTP4/img10.png)
+
+### 7.2 SFTP
+
+```bash
 sftp serveur-tp
-put fichier.txt
-get fichier.txt
-ls
+> put fichier.txt
+> get fichier.txt
+> ls
+> exit
+```
 
-Les commandes permettent de naviguer et transférer des fichiers.
+(Rien de capturé, traces non disponibles)
 
-3) RSYNC
-rsync -avz dossier/ serveur-tp:/home/benoit/dossier/
+### 7.3 RSYNC
 
-Options utilisées :
+```bash
+rsync -avz dossier/ serveur-tp:/home/etudiant/dossier/
+```
 
--a : archive
+---
 
--v : verbose
+## 8. Analyse des logs
 
--z : compression
-
-La synchronisation entre client et serveur fonctionne correctement.
-
-E. Analyse des logs et Fail2Ban
-1) Analyse des logs SSH
+```bash
 sudo tail -f /var/log/auth.log
+```
 
-![img1](imageTP4/img11.png)
+![Journal auth.log](imageTP4/img11.png)
 
-On observe les connexions SSH et l’authentification par clé :
+Observer connexions réussies, échecs de mot de passe, tentatives sur le
+mauvais port, etc.
 
-Accepted publickey
+---
 
-2) Installation de Fail2Ban
+## 9. Installation et analyse de Fail2Ban
+
+```bash
 sudo apt install fail2ban
+sudo systemctl status fail2ban
+sudo fail2ban-client status sshd
+```
 
-Configuration du fichier :
+Configurer `/etc/fail2ban/jail.local` : (exemple ci‑dessous, port 2222)
 
-sudo nano /etc/fail2ban/jail.local
+![Édition jail.local](imageTP4/img22.png)
 
-Contenu :
-
+```
 [sshd]
 enabled = true
-port = 2223
+port = 2222
+backend = systemd
 maxretry = 3
 findtime = 60
 bantime = 60
+```
 
-Redémarrage :
+Redémarrer :
 
+```bash
 sudo systemctl restart fail2ban
+```
 
-Test de bannissement :
+![Redémarrage Fail2Ban](imageTP4/img24.png)
 
-![img1](imageTP4/img12.png)
+Surveillance des logs de bannissement : voir image 25.
 
-Fail2Ban bloque automatiquement les tentatives répétées.
+---
 
-F. Tunnels SSH
-1) Tunnel local
+## 10. Tunnel SSH
+
+### 10.1 Tunnel local
+
+```bash
 ssh -L 8080:localhost:80 serveur-tp
+```
 
-Accès au service web distant via :
+Permet d’accéder à un service HTTP distant via `http://localhost:8080`.
 
-http://localhost:8080
+![Tunnel local établi](imageTP4/img13.png)
 
-![img1](imageTP4/img13.png)
+Résultat affiché par curl :
 
-2) Tunnel distant
+![Page locale](imageTP4/img29.png)
+
+### 10.2 Tunnel distant
+
+```bash
 ssh -R 9090:localhost:22 serveur-tp
+```
 
-Vérification :
+Sur le serveur, `curl http://localhost:9090` renvoie la page du client :
 
-curl http://localhost:9090
+![Tunnel distant](imageTP4/img30.png)
 
-![img1](imageTP4/img14.png)
+---
 
-Le tunnel distant permet l’accès SSH via le serveur.
+## 11. Simulation d’incidents et diagnostic
 
-G. Installation et configuration Nginx
-1) Installation
+- Arrêter SSH : (non illustré).
+- Mauvais port – voir image 37 connexion refusée.
+- Mauvaise IP – pas d’image.
+- Permissions incorrectes – pas d’image.
+- Vérifier réseau, service, port (`ss`), logs, configuration, tests locaux.
+
+![Écoutes réseau](imageTP4/img38.png)
+
+---
+
+## 12. Résultat attendu
+
+- Serveur SSH fonctionnel
+- Authentification par clé uniquement
+- Mot de passe désactivé
+- Root interdit
+- Port modifié
+- Tunnel SSH fonctionnel
+- Transferts opérationnels
+- Fail2Ban actif
+- Analyse logs maîtrisée
+
+---
+
+## 13. Installation et configuration Nginx
+
+```bash
+sudo apt update
 sudo apt install nginx
+sudo systemctl status nginx
+```
 
-![img1](imageTP4/img15.png)
+![Installation Nginx](imageTP4/img15.png)
 
-2) Création du site
+Créer la page test :
+
+```bash
 sudo mkdir -p /var/www/site-tp
+echo '<h1>Bienvenue sur le site TP Nginx !</h1>' \
+    | sudo tee /var/www/site-tp/index.html
+```
 
-Création du fichier index.html :
+![Index Nginx](imageTP4/img16.png)
 
-<h1>HTTPS OK - site-tp</h1>
+Configurer le site :
 
-![img1](imageTP4/img16.png)
+```bash
+sudo vim /etc/nginx/sites-available/site-tp
+```
 
-3) Configuration Nginx
+```nginx
+server {
+    listen 80;
+    server_name localhost;
+    root /var/www/site-tp;
+    index index.html;
+}
+```
 
-Fichier :
+Activer, tester et redémarrer :
 
-/etc/nginx/sites-available/site-tp
-
-![img1](imageTP4/img17.png)
-
-Activation et vérification :
-
+```bash
 sudo ln -s /etc/nginx/sites-available/site-tp /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
-H. HTTPS et certificat auto-signé
-1) Génération du certificat SSL
+```
+
+![Configuration Nginx](imageTP4/img17.png)
+
+---
+
+## 14. HTTPS avec certificat auto-signé
+
+### 14.1 Génération du certificat
+
+```bash
 sudo mkdir -p /etc/nginx/ssl
 cd /etc/nginx/ssl
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
--keyout site-tp.key -out site-tp.crt
+    -keyout site-tp.key -out site-tp.crt
+```
 
-![img1](imageTP4/img18.png)
+![Début de la commande openssl](imageTP4/img43.png)
+![Questions du CSR](imageTP4/img44.png)
+![Fichiers générés](imageTP4/img45.png)
 
-2) Test HTTPS
-curl -k https://192.168.0.29
+### 14.2 Configuration Nginx pour HTTPS
 
-![img1](imageTP4/img19.png)
+Modifier `/etc/nginx/sites-available/site-tp` :
 
-3) Redirection HTTP → HTTPS
-curl -I http://192.168.0.29
+```nginx
+server {
+    listen 443 ssl;
+    server_name localhost;
 
-![img1](imageTP4/img20.png)
+    ssl_certificate /etc/nginx/ssl/site-tp.crt;
+    ssl_certificate_key /etc/nginx/ssl/site-tp.key;
 
-Le code 301 Moved Permanently confirme la redirection automatique.
+    root /var/www/site-tp;
+    index index.html;
+}
 
-I. Firewall et permissions
-1) Configuration du firewall
+server {
+    listen 80;
+    server_name localhost;
+    return 301 https://$host$request_uri;
+}
+```
+
+Tester et redémarrer :
+
+```bash
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+![Test configuration](imageTP4/img47.png)
+
+### 14.3 Test HTTPS
+
+```bash
+curl -k https://<IP_VM>
+```
+
+![Page 404/HTTPS](imageTP4/img48.png)  <!-- réponse nginx, la page test se trouve ailleurs -->
+
+Vérifier la redirection HTTP :
+
+```bash
+curl -I http://<IP_VM>
+```
+
+![Redirection HTTP→HTTPS](imageTP4/img54.png)
+
+---
+
+## 15. Firewall et sécurité
+
+```bash
 sudo ufw allow 'Nginx Full'
+sudo ufw allow 2222
 sudo ufw status
+```
 
-![img1](imageTP4/img21.png)
+![Statut UFW](imageTP4/img21.png)
 
-Ports autorisés :
+On voit l’ouverture du port SSH personnalisé :\
+![Port 2222 dans UFW](imageTP4/img40.png)
 
-2223 (SSH)
+Définir permissions du site :
 
-80 (HTTP)
-
-443 (HTTPS)
-
-2) Permissions du site web
+```bash
 sudo chown -R www-data:www-data /var/www/site-tp
 sudo chmod -R 755 /var/www/site-tp
+```
 
-Les permissions permettent à Nginx de lire les fichiers du site.
+---
 
-J. Validation finale
-Élément	Statut
-SSH sur port personnalisé	✅
-Authentification par clé uniquement	✅
-Root désactivé	✅
-Fail2Ban actif	✅
-SCP / SFTP / RSYNC	✅
-Tunnel local & distant	✅
-Nginx HTTP	✅
-HTTPS fonctionnel	✅
-Redirection HTTP → HTTPS	✅
-Certificat auto-signé valide	✅
-Firewall configuré	✅
-Permissions correctes	✅
+## 16. Résultat attendu
+
+- Nginx accessible en HTTP et HTTPS
+- Redirection automatique HTTP → HTTPS
+- Certificat auto-signé fonctionnel
+- Firewall configuré
+- Page test accessible depuis le client
