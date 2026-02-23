@@ -1,244 +1,516 @@
-# Partie 1 – Prise en main et sécurisation
+Partie 1 – Prise en main et sécurisation
 
-## 1. Accès à l’interface
+1. Accès à l’interface
 
-Connectez-vous à l’interface web de pfSense et observez l’écran suivant :
+Connectez-vous à l’interface web de pfSense.
+Questions :
 
 ![img1](imageTP5/img1)
 
-**Questions :**
 
-- **Quelle est l’adresse IP du LAN ?**  
-  L’interface LAN est configurée sur `192.168.168.56.101` (valeur affichée en haut de la page).
+Quelle est l’adresse IP du LAN  ?
+192.168.168.56.101
 
-- **Quelle est l’adresse IP du WAN ?**  
-  L’adresse WAN est `10.0.2.15`, elle représente l’interface qui fait face à l’Internet.
+Quelle est l’adresse IP du WAN ?
+10.0.2.15
 
-- **Pourquoi utilise‑t‑on HTTPS ?**  
-  Parce que HTTPS chiffre la communication avec la console d’administration, empêchant l’écoute clandestine des identifiants et des données de configuration.
+Pourquoi utilise-t-on HTTPS ?
+c'est sécurisé
 
-- **Pourquoi faut‑il changer les identifiants par défaut sur un pare‑feu ?**  
-  Les comptes « admin » sont livrés avec un mot de passe standard connu de tous. Le modifier empêche qu’un attaquant qui connaît ces identifiants accède à l’appareil et mette en danger le réseau.
+Pourquoi faut-il changer les identifiants par défaut sur un pare-feu ?
 
-## 2. Sécurisation de l’accès administrateur
+car c'est un mdp set par défaut donc tout le monde à le même au début c'est plus sécurisé
 
-Sur l’onglet `System > User Manager` vous pouvez modifier le compte `admin` :
+2. Sécurisation de l’accès administrateur
 
 ![img1](imageTP5/img2)
 
-> *La capture montre l’interface de gestion des utilisateurs où l’on change le mot de passe et, si nécessaire, crée un nouveau compte administrateur.*
+Modifiez les paramètres du compte administrateur.
+Questions :
 
-**Questions :**
 
-- **Où se gèrent les utilisateurs ?**  
-  Dans le menu **System > User Manager** de l’interface pfSense.
+Où se gèrent les utilisateurs ?
+dans system>User manager
 
-- **Qu’est‑ce qu’un mot de passe robuste ?**  
-  Un mot de passe robuste fait au moins 12 caractères, mélange majuscules, minuscules, chiffres et symboles, et ne correspond à aucun mot courant ; il est unique à chaque compte.
+Qu’est-ce qu’un mot de passe robuste ?
+un mdp robust est un mdp avec plus de 12 caractères, des caractères spéciaux, des majuscules ou minuscules, qui est unique et imprévisible.
 
-- **Pourquoi sécuriser en priorité l’accès admin sur un équipement réseau ?**  
-  L’administrateur peut modifier toutes les configurations. S’il est compromis, l’attaquant prend le contrôle du pare‑feu et peut faire sauter les protections, installer des backdoors ou espionner le trafic.
+Pourquoi sécuriser en priorité l’accès admin sur un équipement réseau ?
+car il peut gérer les autres utilisateurs et à accès aux paramètres du réseau
 
-# Partie 2 – Comprendre les interfaces réseau
+Partie 2 – Comprendre les interfaces réseau
 
-## 3. Vérification des interfaces
+3. Vérification des interfaces
 
-Vérifiez que les interfaces WAN et LAN sont correctement affectées. L’image ci‑dessous montre l’écran de statut des interfaces :
+Vérifiez l’affectation WAN / LAN.
 
 ![img1](imageTP5/img2)
 
-**Questions :**
+Questions :
 
-- **Quelle interface permet l’accès Internet ?**  
-  Le port `WAN` relie pfSense à l’Internet.
 
-- **Quelle interface correspond au réseau interne ?**  
-  L’interface `LAN` dessert le réseau local.
+Quelle interface permet l’accès Internet ?
+WAn
 
-- **Que se passerait‑il si les interfaces étaient inversées ?**  
-  Le réseau interne ne pourrait plus accéder à l’Internet ; les paquets sortants seraient rejetés et l’accès à l’interface d’administration pourrait devenir confus ou inaccessible, car le routage serait incorrect.
+Quelle interface correspond au réseau interne ?
+LAN
 
-# Partie 3 – Configuration des services réseau
+Que se passerait-il si les interfaces étaient inversées ?
 
-## 4. DHCP
+Cela peut entrainer des problèmes d'accès à l'interace web et de repérage des interfaces adsl et sdsl
 
-Activez le serveur DHCP pour le réseau LAN et définissez une plage d’adresses :
+Partie 3 – Configuration des services réseau
+
+4. DHCP
+
+Configurez le serveur DHCP pour le réseau LAN.
+
+La gateway
 
 ![img1](imageTP5/img31)
 
-**Questions :**
+Questions :
 
-- **Pourquoi utiliser DHCP plutôt qu’une IP fixe ?**  
-  Le DHCP automatise l’attribution des adresses, évite les conflits d’adresse et simplifie la gestion lorsque des machines se connectent ou se déconnectent fréquemment.
 
-- **Quelle plage d’adresses choisir ?**  
-  Une plage adaptée pourrait être `192.168.56.50` à `192.168.56.200` afin de laisser de l’espace pour les adresses statiques en dehors de ce segment.
+Pourquoi utiliser DHCP plutôt qu’une IP fixe ?
+pour éviter d'avoir 2 appareils avec 2 même ip (conflit ip)
 
-> L’illustration ci‑dessus montre la configuration de la passerelle et la zone de DHCP.
+Quelle plage d’adresses choisir ?
+192.168.56.50 --> 192.168.56.200
 
-![img1](image-TP5/img5.png)
+![img1]](image-TP5/img5.png)
 
-- **Quelles adresses faut‑il éviter d’inclure dans la plage ?**  
-  Les adresses réseau (`192.168.56.0`), de broadcast (`192.168.56.255`) et la passerelle (`192.168.56.254`) ne doivent pas se retrouver dans la plage.
+Quelles adresses faut-il éviter d’inclure dans la plage ?
+192.168.56.255, 192.168.56.0, 192.168.56.254
 
-**Vérification :**
+Vérification :
 
-Après activation, un client Ubuntu obtient automatiquement une adresse :
 
-![img1](image-TP5/img4.png)
+Ubuntu obtient-elle automatiquement une adresse IP ?
 
-## 5. DNS
+oui
 
-Activez le résolveur DNS intégré et configurez‑le selon les captures :
+![img1]](image-TP5/img4.png)
 
-![img1](image-TP5/img8.png)
-![img1](image-TP5/img7.png)
+5. DNS
 
-**Questions :**
+Activez et configurez le résolveur DNS.
 
-- **Pourquoi un pare‑feu peut‑il jouer le rôle de serveur DNS ?**  
-  Il centralise les requêtes des clients, met en cache les réponses pour accélérer les résolutions, permet un filtrage (bloquer des noms malveillants) et protège contre le spoofing.
+![img1]](image-TP5/img8.png)
+![img1]](image-TP5/img7.png)
 
-- **Que se passe‑t‑il si le DNS ne fonctionne pas mais que le ping vers `8.8.8.8` fonctionne ?**  
-  Cela signifie que le routage IP est opérationnel, mais que la résolution des noms de domaine est défaillante : les machines ne peuvent plus traduire les noms en adresses IP.
+Questions :
 
-# Partie 4 – Autoriser l’accès Internet
 
-## 6. Règles de pare‑feu
+Pourquoi un pare-feu peut-il jouer le rôle de serveur DNS ?
 
-Créez une règle de sortie sur l’interface LAN afin que les machines internes puissent accéder à Internet. Rappel : pfSense évalue les règles de haut en bas.
+- Centralisation des requêtes DNS
+- Mise en cache des réponses
+- Possibilité de filtrage
+- Amélioration de la sécurité
 
-**Questions :**
+Que se passe-t-il si le DNS ne fonctionne pas mais que le ping vers 8.8.8.8 fonctionne ?
 
-- **Quelle doit être la source ?**  
-  `LAN net`, car le trafic part du réseau interne.
+Le routage est fonctionnel, mais la résolution des noms de domaine est défaillante.
 
-- **Quelle doit être la destination ?**  
-  `any`, pour autoriser l’accès vers n’importe quel hôte externe.
+Partie 4 – Autoriser l’accès Internet
 
-- **Faut‑il autoriser tous les protocoles ?**  
-  En laboratoire, on peut autoriser tous les protocoles pour tester ; en production on limiterait aux services nécessaires (TCP 80, 443, UDP 53, ICMP, etc.).
+6. Règles de pare-feu
 
-**Tests :**
+Configurez les règles nécessaires pour permettre aux machines du LAN d’accéder à Internet.
+info :
+pfSense applique les règles de haut en bas.
+Questions :
 
-Effectuez un ping vers pfSense, vers `8.8.8.8`, testez une résolution DNS et ouvrez un site Web :
 
-![img1](image-TP5/img37.png)
-![img1](image-TP5/img10.png)
-![img1](image-TP5/img9.png)
+Quelle doit être la source ?
+LAN net
+Parce que le trafic part du réseau interne.
 
-## 7. NAT
+Quelle doit être la destination ?
+any
+Parce que les machines du LAN doivent accéder à Internet.
 
-Vérifiez la configuration du NAT sortant :
+Faut-il autoriser tous les protocoles ?
+En lab : oui (pour tester)
 
-![img1](image-TP5/img11.png)
-![img1](image-TP5/img12.png)
+En production : non (on limiterait à :
 
-**Questions :**
+TCP 80 (HTTP)
 
-- **Pourquoi le NAT est‑il nécessaire avec une interface WAN en NAT ?**  
-  Les adresses privées (192.168.x.x) ne sont pas routables sur Internet. Le NAT transforme ces adresses en l’adresse publique du WAN (`10.0.2.15`), permettant à plusieurs hôtes de partager une seule IP.
+TCP 443 (HTTPS)
 
-- **Quelle est la différence entre NAT automatique et manuel ?**  
-  En mode automatique, pfSense génère les règles de traduction pour chaque réseau; en mode manuel l’administrateur crée lui‑même les règles, pratique dans des scénarios complexes.
+UDP 53 (DNS)
 
-- **Comment vérifier qu’une traduction d’adresse a lieu ?**  
-  Dans `Diagnostics > States`, on voit qu’une entrée montre par exemple `192.168.56.102` traduite en `10.0.2.15`. Cela confirme que les paquets sortent avec l’adresse WAN.
+ICMP si besoin)
 
-# Partie 5 – Filtrage
+Tests :
 
-## 8. Blocage d’un site spécifique
 
-Pour empêcher l’accès à un site, créez une règle de blocage et observez les captures :
+Ping vers pfSense
+Ping vers 8.8.8.8
+Test DNS
+Accès web
 
-![img1](image-TP5/img13.png)
-![img1](image-TP5/img14.png)
+![img1]](image-TP5/img37.png)
+![img1]](image-TP5/img10.png)
+![img1]](image-TP5/img9.png)
 
-**Questions :**
+7. NAT
 
-### Faut‑il bloquer par IP ou par nom de domaine ?  
-Il est préférable de bloquer par nom de domaine (FQDN) car les sites utilisent souvent plusieurs adresses IP (CDN) qui peuvent changer dynamiquement. Un blocage par IP est fragile et nécessite une maintenance continue.
+Vérifiez la configuration du NAT sortant.
+![img1]](image-TP5/img11.png)
+![img1]](image-TP5/img12.png)
 
-### Que se passe‑t‑il si le site utilise HTTPS ?  
-Le trafic est chiffré ; seul l’IP de destination et le port (443) sont visibles par le pare‑feu. Il est impossible de filtrer des pages ou des URI à ce niveau, seul le blocage par nom ou adresse reste possible.
+Questions :
 
-### Pourquoi le blocage par IP peut‑il être contourné ?  
-Les utilisateurs peuvent passer par un VPN, le site peut changer ses adresses, ou le trafic IPv6 peut être employé. Les IPs multiples et variables évitent les filtrages statiques.
 
-Vous pouvez consulter les journaux pour confirmer le blocage :
+Pourquoi le NAT est-il nécessaire avec une interface WAN en NAT ?
 
-![img1](image-TP5/img15.png)
-![img1](image-TP5/img16.png)
+Parce que :
 
-## 9. Blocage d’une catégorie de sites (jeux d’argent)
+Les IP privées (192.168.x.x) ne sont pas routables sur Internet.
 
-Regroupez plusieurs domaines dans un alias et appliquez‑le à une règle.
+Le NAT permet de masquer plusieurs IP privées derrière une seule IP WAN.
 
-![img1](image-TP5/img17.png)
-![img1](image-TP5/img18.png)
-![img1](image-TP5/img19.png)
-![img1](image-TP5/img20.png)
+Quelle est la différence entre NAT automatique et manuel ?
+Automatic :
 
-**Questions – Blocage d’une catégorie de sites**
+pfSense crée les règles automatiquement.
 
-- **Pourquoi ne pas créer une règle par site ?**  
-  Une règle par site rend la configuration verbeuse et difficile à faire évoluer. Un alias permet de maintenir une seule règle regroupant tous les domaines de la catégorie.
+Manual :
 
-- **Où se créent les alias ?**  
-  Dans le menu **Firewall > Aliases**.
+L’administrateur définit précisément les règles.
 
-- **Comment vérifier qu’une règle bloque réellement le trafic ?**  
-  En consultant `Status > System Logs > Firewall`. Les entrées indiquent la source, la destination, l’action « Block » et le numéro de règle correspondant.
+Utilisé en environnement avancé.
 
-# Partie 6 – Aller plus loin (partie plus tendue)
+Comment vérifier qu’une traduction d’adresse a lieu ?
 
-## 10. Blocage par catégorie (réseaux sociaux)
+Dans Diagnostics > States,
+on observe que :
 
-Créez un alias pour regrouper les domaines de réseaux sociaux, puis une règle de blocage.
+192.168.56.102 est traduite en 10.0.2.15 (adresse WAN).
 
-![img1](image-TP5/img21.png)
-![img1](image-TP5/img22.png)
+Cela confirme que le NAT fonctionne correctement.
 
-Analysez les logs pour voir les tentatives bloquées :
+Partie 5 – Filtrage
 
-![img1](image-TP5/img23.png)
-![img1](image-TP5/img24.png)
+8. Blocage d’un site spécifique
 
-**Question :**
+Bloquez l’accès à un site web de votre choix.
 
-- **Que se passe‑t‑il si la règle est placée sous une règle « Pass Any » ?**  
-  Elle ne sera jamais appliquée. pfSense traite les règles de haut en bas et s’arrête à la première correspondance; la règle « Pass Any » laissera passer le trafic avant que le blocage soit évalué.
+![img1]](image-TP5/img13.png)
+![img1]](image-TP5/img14.png)
 
-## 11. Règles horaires
 
-Définissez un horaire :
+Questions :
 
-![img1](image-TP5/img25.png)
 
-Puis associez‑le à une règle existante :
+## Réponses aux questions
 
-![img1](image-TP5/img26.png)
+### Faut-il bloquer par IP ou par nom de domaine ?
 
-**Questions :**
+Il est préférable de bloquer par nom de domaine (FQDN).
+Les sites utilisent plusieurs adresses IP (CDN) qui peuvent changer.
+Le blocage par IP est donc moins fiable et plus difficile à maintenir.
 
-- **Pourquoi les règles horaires sont‑elles utiles en entreprise ?**  
-  Elles permettent d’appliquer des restrictions adaptées aux plages de travail : limiter l’accès à certains services (réseaux sociaux, streaming) en dehors des heures ouvrables, automatiser la politique de sécurité et réduire les usages non professionnels.
+---
 
-## 12. Serveur web local
+### Que se passe-t-il si le site utilise HTTPS ?
 
-Installez un serveur web sur Ubuntu, puis configurez les règles pour n’autoriser que des accès spécifiques :
+Avec HTTPS, le contenu est chiffré.
+Le pare-feu ne voit que l’adresse IP et le port 443.
+Il ne peut pas filtrer des pages ou contenus spécifiques.
 
-![img1](image-TP5/img27.png)
-![img1](image-TP5/img28.png)
+---
 
-La règle autorisant uniquement l’IP source désignée vers le port 80 :
+### Pourquoi le blocage par IP peut-il être contourné ?
 
-![img1](image-TP5/img29.png)
+Le blocage par IP peut être contourné car :
+- Les sites possèdent plusieurs IP.
+- Les IP peuvent changer.
+- L’utilisateur peut utiliser un VPN.
+- Le trafic peut passer en IPv6.
 
-**Questions :**
+Testez et observez les logs.
 
-- **Filtrer par IP source ?**  
-  Oui. On limite l’accès à une machine précise afin de contrôler qui peut consulter le serveur.
+![img1]](image-TP5/img15.png)
+![img1]](image-TP5/img16.png)
 
-- **Filtrer par port ?**  
-  Oui. En ciblant le port 80, on protège uniquement le service HTTP, pas d’autres services évent
+9. Blocage d’une catégorie de sites (jeux d’argent)
+
+Créez une solution propre et maintenable pour bloquer plusieurs sites.
+
+![img1]](image-TP5/img17.png)
+![img1]](image-TP5/img18.png)
+![img1]](image-TP5/img19.png)
+![img1]](image-TP5/img20.png)
+tips : réfléchissez à l’intérêt des alias.
+
+## Questions – Blocage d’une catégorie de sites
+
+### Pourquoi ne pas créer une règle par site ?
+
+Créer une règle par site rend la configuration complexe et difficile à maintenir.
+L’utilisation d’un alias permet de regrouper plusieurs sites dans une seule règle,
+ce qui simplifie la gestion et améliore la lisibilité.
+
+---
+
+### Où se créent les alias ?
+
+Les alias se créent dans :
+Firewall > Aliases.
+
+---
+
+### Comment vérifier qu’une règle bloque réellement le trafic ?
+
+On vérifie dans :
+Status > System Logs > Firewall.
+
+Les logs doivent montrer :
+- L’adresse IP source (machine du LAN)
+- L’adresse IP de destination
+- L’action "Block"
+
+Partie 6 – Aller plus loin (partie plus tendue)
+
+10. Blocage par catégorie (réseaux sociaux)
+
+
+Créez un alias pour une nouvelle catégorie.
+
+![img1]](image-TP5/img21.png)
+
+Implémentez une règle.
+
+![img1]](image-TP5/img22.png)
+
+Analysez les logs.
+![img1]](image-TP5/img23.png)
+![img1]](image-TP5/img24.png)
+
+Question :
+
+Que se passe-t-il si la règle est placée sous une règle "Pass Any" ?
+
+Si la règle de blocage est placée sous une règle "Pass Any",
+elle ne sera jamais appliquée.
+pfSense analyse les règles de haut en bas et applique la première correspondance.
+La règle "Pass Any" autorisera donc le trafic avant que la règle de blocage ne soit évaluée.
+
+11. Règles horaires
+
+
+Créez un horaire.
+
+![img1]](image-TP5/img25.png)
+
+Appliquez-le à une règle existante.
+
+![img1]](image-TP5/img26.png)
+
+Questions :
+
+Pourquoi les règles horaires sont-elles utiles en entreprise ?
+
+Les règles horaires permettent d’activer ou désactiver certaines règles de pare-feu
+en fonction de plages horaires définies.
+
+En entreprise, elles sont utiles pour :
+
+- Limiter l’accès à certains services (réseaux sociaux, streaming) pendant les heures de travail  
+- Appliquer une politique de sécurité adaptée aux horaires d’activité  
+- Réduire les usages non professionnels  
+- Automatiser des restrictions sans intervention manuelle  
+
+Elles permettent donc d’adapter le filtrage aux besoins réels de l’organisation.
+
+12. Serveur web local
+
+Installez un serveur web sur Ubuntu.
+
+![img1]](image-TP5/img27.png)
+![img1]](image-TP5/img28.png)
+
+Objectifs :
+
+Autoriser un accès spécifique
+Bloquer les autres
+
+![img1]](image-TP5/img29.png)
+
+Questions :
+
+🔹 Filtrer par IP source ?
+
+Oui.
+
+On filtre par IP source pour autoriser uniquement une machine précise à accéder au serveur web.
+Cela permet de contrôler qui a le droit d’accéder au service.
+
+🔹 Filtrer par port ?
+
+Oui.
+
+On filtre par port 80 (HTTP) car on souhaite protéger uniquement le service web, pas tout le trafic vers la machine.
+Le filtrage par port permet de contrôler quel service est accessible.
+
+🔹 Pourquoi le pare-feu protège-t-il le LAN même en réseau interne ?
+
+Parce que tout le trafic entre les machines du réseau passe par l’interface LAN de pfSense (192.168.56.1).
+
+pfSense filtre tous les paquets qui traversent une interface, même si le trafic est interne au réseau privé.
+
+Donc le pare-feu contrôle aussi les communications à l’intérieur du LAN.
+
+13. Logs et analyse
+
+Activez la journalisation sur certaines règles.
+
+![img1]](image-TP5/img30.png)
+
+Questions :
+
+
+🔹 Différence entre paquet bloqué et autorisé
+
+Paquet autorisé (Pass) :
+Le pare-feu laisse passer le trafic vers sa destination.
+
+Paquet bloqué (Block) :
+Le pare-feu refuse le trafic, la communication ne peut pas s’établir.
+
+Dans les logs, l’action indiquée est Pass ou Block.
+
+🔹 Identifier quelle règle a déclenché le blocage
+
+Dans Status → System Logs → Firewall, chaque entrée indique :
+
+L’interface (ex : LAN)
+
+L’action (Block / Pass)
+
+Les adresses IP source et destination
+
+Le port utilisé
+
+Le numéro ou l’identifiant de la règle
+
+Le numéro de règle permet de retrouver exactement la règle responsable dans Firewall → Rules.
+
+🔹 Comprendre le sens du trafic
+
+Dans les logs :
+
+Source = machine qui envoie le paquet
+
+Destination = machine qui reçoit le paquet
+
+Exemple :
+192.168.56.11 → 192.168.56.10 : 80
+
+Cela signifie que la machine 192.168.56.11 tente d’accéder au port 80 du serveur 192.168.56.10.
+
+Le sens du trafic permet de comprendre qui initie la communication.
+
+15. Filtrage MAC
+
+Testez le filtrage par adresse MAC.
+
+![img1]](image-TP5/img32.png)
+![img1]](image-TP5/img33.png)
+
+Question :
+
+
+🔹 Le filtrage MAC est-il réellement sécurisé ?
+
+Non.
+
+Le filtrage par adresse MAC n’est pas réellement sécurisé.
+Il peut limiter l’accès dans un environnement simple, mais il ne constitue pas une protection fiable.
+
+🔹 Pourquoi est-il facilement contournable ?
+
+Parce que :
+
+Une adresse MAC peut être modifiée facilement (MAC spoofing).
+
+Il suffit d’observer le réseau pour connaître une adresse MAC autorisée.
+
+Un attaquant peut configurer sa carte réseau avec cette adresse.
+
+Donc le filtrage MAC repose sur une information facilement falsifiable, contrairement à une authentification forte ou à un filtrage par IP sécurisé.
+
+16. Portail captif
+
+Implémentez un portail captif.
+
+![img1]](image-TP5/img34.png)
+
+Questions :
+
+🔹 Dans quels contextes utilise-t-on cela ?
+
+On utilise un portail captif dans :
+
+Hôtels
+
+Aéroports
+
+Universités
+
+Entreprises
+
+Wi-Fi public
+
+Il sert à contrôler l’accès des utilisateurs au réseau.
+
+🔹 Quel(s) avantage(s) par rapport à une simple règle de pare-feu ?
+
+Un portail captif permet :
+
+D’authentifier les utilisateurs
+
+D’identifier qui se connecte
+
+D’appliquer des restrictions par utilisateur
+
+De présenter des conditions d’utilisation
+
+Une simple règle de pare-feu :
+
+Autorise ou bloque une IP
+
+Ne gère pas l’authentification utilisateur
+
+Le portail captif offre donc un contrôle plus précis et traçable.
+
+17. Sauvegarde / restauration
+
+
+Sauvegardez la configuration.
+
+![img1]](image-TP5/img35.png)
+
+Modifiez-la.
+Restaurez-la.
+
+![img1]](image-TP5/img36.png)
+
+Question :
+
+🔹 Pourquoi la sauvegarde régulière est-elle essentielle en production ?
+
+Parce qu’elle permet :
+
+De restaurer rapidement le système en cas d’erreur de configuration
+
+De récupérer après une panne ou une attaque
+
+D’éviter une interruption prolongée du service réseau
+
+Sans sauvegarde, une mauvaise configuration peut rendre le réseau inutilisable.
+
