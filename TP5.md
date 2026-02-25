@@ -56,7 +56,7 @@ Modifiez les paramètres du compte administrateur.
 
 Vérifiez l’affectation WAN / LAN.
 
-![Interfaces](imageTP5/img2.png)
+![Interfaces](imageTP5/img3.png)
 
 **Questions**
 
