@@ -336,4 +336,3 @@ Sauvegardez puis restaurez la configuration.
 
 ---
 
-*Fin du TP5*
